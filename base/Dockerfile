@@ -5,6 +5,8 @@ FROM scratch
 ARG root_date
 ADD roots/archlinux-${root_date}.tar.xz /
 
+RUN pacman -Syyuu --noconfirm
+
 RUN pacman -S --noconfirm \
         sudo \
         bash-completion \
