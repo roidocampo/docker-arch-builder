@@ -7,12 +7,14 @@ root_date=2016-08-28
 
 current_root=base/roots/archlinux-$(root_date).tar.xz
 
-.PHONY: default image
+.PHONY: default image docker_image
 
 default: 
 	@echo Make what?
 	
-image: $(current_root) 
+image: run_image.sh
+
+docker_image: $(current_root)
 	@echo
 	@echo Building docker image: $(image_name)
 	@echo ==================================================================
@@ -37,3 +39,11 @@ $(current_root):
 	    /bin/bash aux_mkimage.sh \
 	    $(subst -,/,$(root_date))
 
+run_image.sh: docker_image
+	@echo
+	@echo Building runner: $@
+	@echo ==================================================================
+	@echo
+	echo "#!/bin/bash" > "$@"
+	echo "exec docker run --rm -it -p 8888:8888 $(image_name)" >> "$@"
+	chmod +x "$@"
