@@ -1,0 +1,50 @@
+# Contributor: Roi Docampo <roidocampo@gmail.com>
+
+pkgname=macaulay2
+pkgver=14130.4947cfd
+pkgrel=1
+pkgdesc="Software system for algebraic geometry and commutative algebra"
+arch=('i686' 'x86_64')
+url="http://www.math.uiuc.edu/Macaulay2/"
+license=('GPL')
+depends=('autoconf' 'automake' 'bison' 'boost' 'cddlib' 'emacs' 'flex' 'flint'
+         'gc' 'gcc' 'gcc-fortran' 'gdbm' 'gfan' 'git' 'givaro' 'glpk' 'gmp'
+         'gtest' 'lapack' 'make' 'mpfr' 'nauty' 'ntl' 'pkg-config' 'readline'
+         'texinfo' 'time' 'unzip')
+makedepends=('git' 'unzip' 'emacs' 'texinfo' 'gcc5')
+source=('git+https://github.com/Macaulay2/M2')
+md5sums=('SKIP')
+
+pkgver() {
+    cd "${srcdir}"/M2
+    echo `git rev-list --count master`.`git rev-parse --short master`
+}
+
+build() {
+    cd "$srcdir"/M2/M2
+
+    # We need to compile using gcc 5
+    export CC=gcc-5 
+    export CXX=g++-5
+
+    make
+
+    ./configure \
+        --prefix='/usr' \
+        --libexecdir='${prefix}'/lib/Macaulay2 \
+        --enable-download \
+        --enable-build-libraries="pari flint ntl gc givaro"
+
+    make -j1
+}
+
+package() {
+    cd "$srcdir"/M2/M2
+    make DESTDIR="$pkgdir" install
+
+    cd "$pkgdir"/usr/share
+    mv info info-mac
+    mkdir info
+    mv info-mac info/Macaulay2
+}
+

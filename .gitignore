@@ -1,2 +1,5 @@
 run_image.sh
 *.tar.xz
+.phonydir
+aur/build/*
+old
